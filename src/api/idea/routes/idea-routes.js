@@ -17,9 +17,15 @@ module.exports = {
     },
     {
       method: "PUT",
-      path: "/idea/favoriteIdea",
-      handler: "idea.favoriteIdea",
+      path: "/idea/saveIdea",
+      handler: "idea.saveIdea",
     },
+    {
+      method: "PUT",
+      path: "/idea/likeIdea",
+      handler: "idea.likeIdea",
+    },
+
     {
       method: "PUT",
       path: "/idea/reportIdea",
@@ -32,8 +38,8 @@ module.exports = {
     },
     {
       method: "GET",
-      path: "/idea/getAllFavoriteIdeas",
-      handler: "idea.getAllFavoriteIdeas",
+      path: "/idea/getAllSavedIdeas",
+      handler: "idea.getAllSavedIdeas",
     },
     {
       method: "GET",

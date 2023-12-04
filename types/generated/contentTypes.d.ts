@@ -362,6 +362,110 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
+export interface ApiBookBook extends Schema.CollectionType {
+  collectionName: 'books';
+  info: {
+    singularName: 'book';
+    pluralName: 'books';
+    displayName: 'Book';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    title: Attribute.String;
+    author: Attribute.String;
+    description: Attribute.Text;
+    image: Attribute.Media;
+    category: Attribute.Relation<
+      'api::book.book',
+      'manyToOne',
+      'api::category.category'
+    >;
+    ideas: Attribute.Relation<'api::book.book', 'oneToMany', 'api::idea.idea'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::book.book', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::book.book', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiCategoryCategory extends Schema.CollectionType {
+  collectionName: 'categories';
+  info: {
+    singularName: 'category';
+    pluralName: 'categories';
+    displayName: 'Category';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    name: Attribute.String;
+    color: Attribute.JSON;
+    books: Attribute.Relation<
+      'api::category.category',
+      'oneToMany',
+      'api::book.book'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::category.category',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::category.category',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiIdeaIdea extends Schema.CollectionType {
+  collectionName: 'ideas';
+  info: {
+    singularName: 'idea';
+    pluralName: 'ideas';
+    displayName: 'Idea';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    title: Attribute.String;
+    content: Attribute.RichText;
+    book: Attribute.Relation<'api::idea.idea', 'manyToOne', 'api::book.book'>;
+    creator: Attribute.Relation<
+      'api::idea.idea',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    reports: Attribute.Integer & Attribute.DefaultTo<0>;
+    likesCount: Attribute.Integer & Attribute.DefaultTo<0>;
+    savesCount: Attribute.Integer;
+    sharesCount: Attribute.Integer;
+    user: Attribute.Relation<
+      'api::idea.idea',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::idea.idea', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::idea.idea', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -620,41 +724,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::idea.idea'
     >;
-    tasks: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::task.task'
-    >;
-    routines: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::routine.routine'
-    >;
-    questions: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::question.question'
-    >;
     avatar: Attribute.Media;
     saved_ideas: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
       'api::idea.idea'
-    >;
-    saved_questions: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::question.question'
-    >;
-    saved_routines: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::routine.routine'
-    >;
-    saved_tasks: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::task.task'
     >;
     interests: Attribute.Relation<
       'plugin::users-permissions.user',
@@ -662,16 +736,16 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::category.category'
     >;
     reports: Attribute.JSON;
-    decks: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::deck.deck'
-    >;
     bio: Attribute.Text;
     saved_books: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
       'api::book.book'
+    >;
+    liked_ideas: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::idea.idea'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -734,255 +808,6 @@ export interface PluginI18NLocale extends Schema.CollectionType {
   };
 }
 
-export interface ApiBookBook extends Schema.CollectionType {
-  collectionName: 'books';
-  info: {
-    singularName: 'book';
-    pluralName: 'books';
-    displayName: 'Book';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    title: Attribute.String;
-    author: Attribute.String;
-    description: Attribute.Text;
-    image: Attribute.Media;
-    category: Attribute.Relation<
-      'api::book.book',
-      'manyToOne',
-      'api::category.category'
-    >;
-    tasks: Attribute.Relation<'api::book.book', 'oneToMany', 'api::task.task'>;
-    ideas: Attribute.Relation<'api::book.book', 'oneToMany', 'api::idea.idea'>;
-    routines: Attribute.Relation<
-      'api::book.book',
-      'oneToMany',
-      'api::routine.routine'
-    >;
-    questions: Attribute.Relation<
-      'api::book.book',
-      'oneToMany',
-      'api::question.question'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::book.book', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::book.book', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiCategoryCategory extends Schema.CollectionType {
-  collectionName: 'categories';
-  info: {
-    singularName: 'category';
-    pluralName: 'categories';
-    displayName: 'Category';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    name: Attribute.String;
-    color: Attribute.JSON;
-    books: Attribute.Relation<
-      'api::category.category',
-      'oneToMany',
-      'api::book.book'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::category.category',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::category.category',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiDeckDeck extends Schema.CollectionType {
-  collectionName: 'decks';
-  info: {
-    singularName: 'deck';
-    pluralName: 'decks';
-    displayName: 'Deck';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    name: Attribute.String;
-    description: Attribute.Text;
-    creator: Attribute.Relation<
-      'api::deck.deck',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    cards: Attribute.Component<'deck.card', true>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::deck.deck', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::deck.deck', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiIdeaIdea extends Schema.CollectionType {
-  collectionName: 'ideas';
-  info: {
-    singularName: 'idea';
-    pluralName: 'ideas';
-    displayName: 'Idea';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    title: Attribute.String;
-    content: Attribute.RichText;
-    book: Attribute.Relation<'api::idea.idea', 'manyToOne', 'api::book.book'>;
-    creator: Attribute.Relation<
-      'api::idea.idea',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    favorites: Attribute.Integer & Attribute.DefaultTo<0>;
-    reports: Attribute.Integer & Attribute.DefaultTo<0>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::idea.idea', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::idea.idea', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiQuestionQuestion extends Schema.CollectionType {
-  collectionName: 'questions';
-  info: {
-    singularName: 'question';
-    pluralName: 'questions';
-    displayName: 'Question';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    content: Attribute.Text;
-    book: Attribute.Relation<
-      'api::question.question',
-      'manyToOne',
-      'api::book.book'
-    >;
-    creator: Attribute.Relation<
-      'api::question.question',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    prompt: Attribute.RichText;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::question.question',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::question.question',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiRoutineRoutine extends Schema.CollectionType {
-  collectionName: 'routines';
-  info: {
-    singularName: 'routine';
-    pluralName: 'routines';
-    displayName: 'Routine';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    name: Attribute.String;
-    duration: Attribute.Integer;
-    book: Attribute.Relation<
-      'api::routine.routine',
-      'manyToOne',
-      'api::book.book'
-    >;
-    creator: Attribute.Relation<
-      'api::routine.routine',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    content: Attribute.RichText;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::routine.routine',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::routine.routine',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiTaskTask extends Schema.CollectionType {
-  collectionName: 'tasks';
-  info: {
-    singularName: 'task';
-    pluralName: 'tasks';
-    displayName: 'Task';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    content: Attribute.String;
-    subtasks: Attribute.Component<'content.subtask', true>;
-    book: Attribute.Relation<'api::task.task', 'manyToOne', 'api::book.book'>;
-    creator: Attribute.Relation<
-      'api::task.task',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::task.task', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::task.task', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -993,19 +818,15 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'api::book.book': ApiBookBook;
+      'api::category.category': ApiCategoryCategory;
+      'api::idea.idea': ApiIdeaIdea;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
-      'api::book.book': ApiBookBook;
-      'api::category.category': ApiCategoryCategory;
-      'api::deck.deck': ApiDeckDeck;
-      'api::idea.idea': ApiIdeaIdea;
-      'api::question.question': ApiQuestionQuestion;
-      'api::routine.routine': ApiRoutineRoutine;
-      'api::task.task': ApiTaskTask;
     }
   }
 }

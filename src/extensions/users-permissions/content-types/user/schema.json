@@ -71,24 +71,6 @@
       "target": "api::idea.idea",
       "mappedBy": "creator"
     },
-    "tasks": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::task.task",
-      "mappedBy": "creator"
-    },
-    "routines": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::routine.routine",
-      "mappedBy": "creator"
-    },
-    "questions": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::question.question",
-      "mappedBy": "creator"
-    },
     "avatar": {
       "type": "media",
       "multiple": false,
@@ -105,21 +87,6 @@
       "relation": "oneToMany",
       "target": "api::idea.idea"
     },
-    "saved_questions": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::question.question"
-    },
-    "saved_routines": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::routine.routine"
-    },
-    "saved_tasks": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::task.task"
-    },
     "interests": {
       "type": "relation",
       "relation": "oneToMany",
@@ -128,12 +95,6 @@
     "reports": {
       "type": "json"
     },
-    "decks": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::deck.deck",
-      "mappedBy": "creator"
-    },
     "bio": {
       "type": "text"
     },
@@ -141,6 +102,12 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::book.book"
+    },
+    "liked_ideas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::idea.idea",
+      "mappedBy": "user"
     }
   }
 }

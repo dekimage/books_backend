@@ -19,8 +19,14 @@ module.exports = createCoreController("api::idea.idea", ({ strapi }) => ({
 
     const idea = await strapi.db
       .query("api::idea.idea")
+      .findOne({ where: { book: data.book, creator: id } });
+
+    if (idea) ctx.throw(400, "You already have an idea for this book!");
+
+    const newIdea = await strapi.db
+      .query("api::idea.idea")
       .create({ data: { ...data, creator: id } });
-    return idea;
+    return newIdea;
   },
 
   async updateIdea(ctx) {
@@ -59,7 +65,47 @@ module.exports = createCoreController("api::idea.idea", ({ strapi }) => ({
     return { success: true };
   },
 
-  async favoriteIdea(ctx) {
+  async likeIdea(ctx) {
+    const { id } = ctx.request.body;
+    const userId = ctx.state.user.id;
+
+    const idea = await strapi.db
+      .query("api::idea.idea")
+      .findOne({ where: { id } });
+
+    if (!idea) throw new Error("Idea not found");
+
+    const user = await strapi.db
+      .query("plugin::users-permissions.user")
+      .findOne({ where: { id: userId }, populate: { liked_ideas: true } });
+
+    let newLikedIdeas = user.liked_ideas || [];
+
+    const isAlreadyLiked =
+      newLikedIdeas.length > 0 &&
+      newLikedIdeas.filter((a) => a.id == id).length > 0;
+
+    if (isAlreadyLiked) {
+      newLikedIdeas = newLikedIdeas.filter((a) => a.id != id);
+    } else {
+      newLikedIdeas.push(id);
+    }
+
+    await strapi.db.query("api::idea.idea").update({
+      where: { id },
+      data: {
+        likesCount: isAlreadyLiked ? idea.likesCount - 1 : idea.likesCount + 1,
+      },
+    });
+
+    await strapi.db.query("plugin::users-permissions.user").update({
+      where: { id: userId },
+      data: { liked_ideas: newLikedIdeas },
+    });
+    return { success: true };
+  },
+
+  async saveIdea(ctx) {
     const { id } = ctx.request.body;
     const userId = ctx.state.user.id;
 
@@ -88,7 +134,9 @@ module.exports = createCoreController("api::idea.idea", ({ strapi }) => ({
     await strapi.db.query("api::idea.idea").update({
       where: { id },
       data: {
-        favorites: isAlreadyFavorite ? idea.favorites - 1 : idea.favorites + 1,
+        savesCount: isAlreadyFavorite
+          ? idea.savesCount - 1
+          : idea.savesCount + 1,
       },
     });
 
@@ -126,13 +174,18 @@ module.exports = createCoreController("api::idea.idea", ({ strapi }) => ({
   async getAllMyIdeas(ctx) {
     const { id } = ctx.state.user;
 
-    const ideas = await strapi.db
-      .query("api::idea.idea")
-      .findMany({ where: { creator: id } });
+    const ideas = await strapi.db.query("api::idea.idea").findMany({
+      where: { creator: id },
+
+      populate: {
+        book: { populate: { image: true } },
+        creator: { populate: { avatar: true } },
+      },
+    });
     return ideas;
   },
 
-  async getAllFavoriteIdeas(ctx) {
+  async getAllSavedIdeas(ctx) {
     const { id } = ctx.state.user;
 
     const user = await strapi.db
@@ -146,20 +199,24 @@ module.exports = createCoreController("api::idea.idea", ({ strapi }) => ({
     const { bookId } = ctx.query;
     const user = ctx.state.user;
 
-    const ideas = await strapi.db.query("api::idea.idea").findMany({
+    const idea = await strapi.db.query("api::idea.idea").findOne({
       where: { creator: user.id, book: bookId },
       populate: { book: { populate: { image: true } } },
     });
 
-    return ideas.map((idea) => ({
-      ...idea,
-      creator: {
-        username: user.username,
-        avatar: user.avatar,
-        bio: user.bio,
-        createdAt: user.createdAt,
-      },
-    }));
+    if (idea) {
+      return {
+        ...idea,
+        creator: {
+          username: user.username,
+          avatar: user.avatar,
+          bio: user.bio,
+          createdAt: user.createdAt,
+        },
+      };
+    } else {
+      return null;
+    }
   },
 
   async getBookFavorites(ctx) {

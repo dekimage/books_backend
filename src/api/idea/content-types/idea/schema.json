@@ -30,13 +30,25 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "ideas"
     },
-    "favorites": {
-      "type": "integer",
-      "default": 0
-    },
     "reports": {
       "type": "integer",
       "default": 0
+    },
+    "likesCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "savesCount": {
+      "type": "integer"
+    },
+    "sharesCount": {
+      "type": "integer"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "liked_ideas"
     }
   }
 }
